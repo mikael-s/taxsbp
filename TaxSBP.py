@@ -25,8 +25,15 @@
 
 import binpacking
 import argparse
-from collections import defaultdict
+from collections import defaultdict, Iterable
 
+# http://stackoverflow.com/a/2158532/1192742
+def flatten(l):
+	for el in l:
+		if isinstance(el, Iterable) and not isinstance(el, (str, bytes)):
+			yield from flatten(el)
+		else:
+			yield el
 def main():
 	parser = argparse.ArgumentParser(prog='TaxSBP')
 	parser.add_argument('-a', required=True, metavar='<assembly_reports>', dest="assembly_reports")
@@ -35,6 +42,7 @@ def main():
 	parser.add_argument('-b', default=50, metavar='<bins>', dest="bins", type=int)
 	parser.add_argument('-l', metavar='<bin_len>', dest="bin_len", type=int)
 	parser.add_argument('-v', action='version', version='%(prog)s 0.01')
+	parser.add_argument('-t', action = 'store_true', dest='tab_output', help = 'Tab-separated output (one sequence per line)')
 	args = parser.parse_args()
 	
 	global parents
@@ -80,7 +88,11 @@ def main():
 	# Print resuls (by sequence)
 	for binid,bin in enumerate(final_bins):
 		for id in bin[1:]:
-			print(id,binid,sep="\t")
+			if args.tab_output:
+				for accession in flatten(id):
+					print (accession, binid, sep="\t")
+			else:
+				print(id,binid,sep="\t")
 
 # Input: list of tuples [(seqlen, seqid1 [, ..., seqidN])]
 # Output: bin packed list of tuples [(seqlen, seqid1 [, ..., seqidN])]
