@@ -98,7 +98,7 @@ def bpck(d):
 				for i in bin:
 					sum_length+=i[0]
 					ids.extend(i[1:])
-				ret.append((sum_length,*ids))
+				ret.append((sum_length,ids))
 		return ret
 
 def ApproxSBP(v):
